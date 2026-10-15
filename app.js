@@ -7,6 +7,7 @@
 const EXPERIMENT_DATA = {
   scifi: {
     query: "I loved this science fiction movie. The visual effects were stunning and the space battles felt realistic. The plot about an alien invasion and humanity fighting back kept me hooked. Great acting, a gripping story, and unforgettable special effects.",
+    meanScores: { tfidf: "0.128", cbow: "0.806", skipgram: "0.906" },
     tfidf: [
       {
         rank: 1,
@@ -182,6 +183,7 @@ const EXPERIMENT_DATA = {
 
   romcom: {
     query: "A charming romantic comedy with a sweet love story, funny dialogue, and a happy ending.",
+    meanScores: { tfidf: "0.132", cbow: "0.849", skipgram: "0.918" },
     tfidf: [
       {
         rank: 1,
@@ -357,6 +359,7 @@ const EXPERIMENT_DATA = {
 
   horror: {
     query: "A held-out negative review of a teen supernatural movie featuring church youth groups, car crashes, and ghost-like apparitions compared to Lost Highway.",
+    meanScores: { tfidf: "0.148", cbow: "0.832", skipgram: "0.921" },
     tfidf: [
       {
         rank: 1,
@@ -628,11 +631,23 @@ function openFilmModal(item, modelLabel) {
   reviewModal.classList.remove("hidden");
 }
 
+// DOM refs for panel header stats
+const statTfidf    = document.querySelector("#panel-tfidf .stat-number");
+const statCbow     = document.querySelector("#panel-cbow .stat-number");
+const statSkipgram = document.querySelector("#panel-skipgram .stat-number");
+
 // Load a benchmark preset into view
 function loadPreset(presetKey) {
   currentPreset = presetKey;
   const data = EXPERIMENT_DATA[presetKey];
   queryInput.value = data.query;
+
+  // Update header stat numbers so they reflect the active preset
+  if (data.meanScores) {
+    if (statTfidf)    statTfidf.textContent    = data.meanScores.tfidf;
+    if (statCbow)     statCbow.textContent     = data.meanScores.cbow;
+    if (statSkipgram) statSkipgram.textContent = data.meanScores.skipgram;
+  }
 
   renderColumn(listTfidf, data.tfidf, "TF-IDF Vectorizer");
   renderColumn(listCbow, data.cbow, "Word2Vec (CBOW)");
