@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Reading Assistant | TF-IDF vs Word2Vec (CBOW vs Skip-Gram)</title>
+  <meta name="description" content="Comparative Information Retrieval & Recommendation System evaluating TF-IDF against Word2Vec (CBOW & Skip-Gram) embeddings on the 2,000 document NLTK movie reviews corpus.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background lighting -->
+  <div class="ambient-glow glow-indigo"></div>
+  <div class="ambient-glow glow-cyan"></div>
+  <div class="ambient-glow glow-emerald"></div>
+
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="hero-header">
+      <div class="status-pill">
+        <span class="live-indicator"></span>
+        <span>NLP Information Retrieval & Recommendation Benchmark</span>
+      </div>
+      <h1 class="main-title">Personalized Reading <span class="gradient-text">Assistant</span></h1>
+      <p class="hero-subtitle">
+        Evaluating Sparse Vector Space Models (<strong>TF-IDF</strong>) vs. Dense Distributed Embeddings (<strong>Word2Vec CBOW & Skip-Gram</strong>) on 2,000 IMDB Reviews.
+      </p>
+
+      <div class="action-bar">
+        <a href="https://github.com/Abdullahtss/Personalized-Reading-Assistant" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+        <button id="toggle-insights-btn" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Key Research Findings
+        </button>
+      </div>
+    </header>
+
+    <!-- Key Findings Collapsible Drawer -->
+    <section id="insights-drawer" class="insights-panel card hidden">
+      <div class="insights-header">
+        <h3>💡 Empirical Benchmark Insights: Why TF-IDF Won</h3>
+        <button id="close-insights-btn" class="close-x">&times;</button>
+      </div>
+      <div class="insights-grid">
+        <div class="insight-box">
+          <div class="insight-tag tag-tfidf">TF-IDF Accuracy</div>
+          <h4>Captures Exact Topical "Aboutness"</h4>
+          <p>Rare, high-IDF keywords (<em>alien, invasion, science fiction</em>) trigger sharp, precise cosine activations. It successfully recommended <em>Independence Day</em> & <em>Aliens</em>.</p>
+        </div>
+        <div class="insight-box">
+          <div class="insight-tag tag-word2vec">Embedding Dilemma</div>
+          <h4>The Mean-Pooling Dilution Trap</h4>
+          <p>Averaging word vectors across 300+ words pulls document vectors toward a generic review centroid (<em>scene, plot, character</em>), causing CGI demos to outrank true plot matches.</p>
+        </div>
+        <div class="insight-box">
+          <div class="insight-tag tag-skipgram">Skip-Gram Advantage</div>
+          <h4>Tone & Niche Word Sensitivity</h4>
+          <p>Skip-Gram outperformed CBOW significantly on rare tokens and sentiment matching (<strong>80%</strong> tone consistency), making it the superior dense representation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Query Selection & Sandbox -->
+    <section class="query-section card">
+      <div class="query-topbar">
+        <span class="section-tag">TEST QUERIES</span>
+        <span class="corpus-tag">Dataset: NLTK movie_reviews (2,000 docs • 79,696 n-grams)</span>
+      </div>
+
+      <div class="query-presets">
+        <button class="preset-btn active" data-query="scifi">
+          <span class="preset-icon">🚀</span>
+          <span class="preset-name">Sci-Fi Alien Invasion</span>
+        </button>
+        <button class="preset-btn" data-query="romcom">
+          <span class="preset-icon">❤️</span>
+          <span class="preset-name">Romantic Comedy</span>
+        </button>
+        <button class="preset-btn" data-query="horror">
+          <span class="preset-icon">👻</span>
+          <span class="preset-name">Supernatural Horror</span>
+        </button>
+      </div>
+
+      <div class="active-query-card">
+        <div class="query-label-row">
+          <span class="query-label">ACTIVE PROMPT / USER INTENT:</span>
+          <span class="query-token-count" id="query-tokens-badge">38 tokens</span>
+        </div>
+        <blockquote class="query-text" id="display-query-text">
+          "I loved this science fiction movie. The visual effects were stunning and the space battles felt realistic. The plot about an alien invasion and humanity fighting back kept me hooked. Great acting, a gripping story, and unforgettable special effects."
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- Model Comparison Matrix -->
+    <section class="models-grid">
+      <!-- 1. TF-IDF -->
+      <div class="model-col card col-tfidf">
+        <div class="model-badge-row">
+          <span class="model-badge badge-green">Winner 🏆</span>
+          <span class="vector-type">Sparse (79,696-D)</span>
+        </div>
+        <h2 class="model-title">TF-IDF Vectorizer</h2>
+        <p class="model-desc">Sublinear TF scaling + Bigram enrichment</p>
+
+        <div class="metric-ribbon">
+          <div class="m-item">
+            <span class="m-label">Mean Cosine</span>
+            <strong class="m-val">0.128</strong>
+          </div>
+          <div class="m-item">
+            <span class="m-label">Content Match</span>
+            <strong class="m-val color-green">High (100%)</strong>
+          </div>
+        </div>
+
+        <div class="results-list" id="tfidf-results">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- 2. Word2Vec CBOW -->
+      <div class="model-col card col-cbow">
+        <div class="model-badge-row">
+          <span class="model-badge badge-amber">Broad Context</span>
+          <span class="vector-type">Dense (100-D)</span>
+        </div>
+        <h2 class="model-title">Word2Vec (CBOW)</h2>
+        <p class="model-desc">Continuous Bag of Words • sg=0 • Mean pooled</p>
+
+        <div class="metric-ribbon">
+          <div class="m-item">
+            <span class="m-label">Mean Cosine</span>
+            <strong class="m-val">0.806</strong>
+          </div>
+          <div class="m-item">
+            <span class="m-label">Topical Precision</span>
+            <strong class="m-val color-amber">Loose</strong>
+          </div>
+        </div>
+
+        <div class="results-list" id="cbow-results">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- 3. Word2Vec Skip-Gram -->
+      <div class="model-col card col-skipgram">
+        <div class="model-badge-row">
+          <span class="model-badge badge-purple">Best Embedding</span>
+          <span class="vector-type">Dense (100-D)</span>
+        </div>
+        <h2 class="model-title">Word2Vec (Skip-Gram)</h2>
+        <p class="model-desc">Continuous Skip-Gram • sg=1 • Mean pooled</p>
+
+        <div class="metric-ribbon">
+          <div class="m-item">
+            <span class="m-label">Mean Cosine</span>
+            <strong class="m-val">0.906</strong>
+          </div>
+          <div class="m-item">
+            <span class="m-label">Tone Match</span>
+            <strong class="m-val color-purple">80% Consistent</strong>
+          </div>
+        </div>
+
+        <div class="results-list" id="skipgram-results">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Mathematical Diagnostics & Set Overlap Section -->
+    <section class="diagnostics-section card">
+      <div class="diag-header">
+        <h2>🔬 Mathematical Diagnostics & Set Overlap Analysis</h2>
+        <span class="diag-badge">Jaccard Top-5 Similarity</span>
+      </div>
+
+      <div class="diag-body">
+        <div class="matrix-card">
+          <h3>Top-5 Jaccard Similarity Matrix</h3>
+          <p class="matrix-sub">How frequently the models retrieve the same film documents:</p>
+          <div class="matrix-table">
+            <div class="matrix-row header-row">
+              <span class="cell"></span>
+              <span class="cell">TF-IDF</span>
+              <span class="cell">CBOW</span>
+              <span class="cell">Skip-Gram</span>
+            </div>
+            <div class="matrix-row">
+              <span class="cell row-label">TF-IDF</span>
+              <span class="cell val-100">1.00</span>
+              <span class="cell val-low">0.11</span>
+              <span class="cell val-med">0.25</span>
+            </div>
+            <div class="matrix-row">
+              <span class="cell row-label">CBOW</span>
+              <span class="cell val-low">0.11</span>
+              <span class="cell val-100">1.00</span>
+              <span class="cell val-high">0.43</span>
+            </div>
+            <div class="matrix-row">
+              <span class="cell row-label">Skip-Gram</span>
+              <span class="cell val-med">0.25</span>
+              <span class="cell val-high">0.43</span>
+              <span class="cell val-100">1.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="why-card">
+          <h3>Why Do Cosine Scales Differ?</h3>
+          <ul class="why-list">
+            <li>
+              <strong>TF-IDF Cosine (~0.13):</strong> Documents live in a 79,696-dimensional sparse space. Since a query only contains ~25 terms, 99.9% of coordinates are zero.
+            </li>
+            <li>
+              <strong>Word2Vec Cosine (~0.91):</strong> Averaging all 330 words in each review squeezes every document vector into a narrow hyper-cone in 100-D space, creating high numerical cosine scores without indicating high confidence.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Developed by <strong>Abdullah Bin Ahmed</strong> (L227444) • Natural Language Processing (CS4063) • FAST NUCES</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
